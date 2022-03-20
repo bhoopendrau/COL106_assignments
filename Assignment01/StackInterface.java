@@ -1,0 +1,14 @@
+
+class EmptyStackException extends Exception {
+    public EmptyStackException() {
+        super();
+    }
+}
+
+interface StackInterface {
+    public void push(Object o);
+    public Object pop() throws EmptyStackException;
+    public Object top() throws EmptyStackException;
+    public boolean isEmpty();
+    public String toString();
+}
