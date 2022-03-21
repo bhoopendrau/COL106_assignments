@@ -1,5 +1,5 @@
 public class Customer {
-    int id,arriveTime,toShef,toGriddle,getFood;
+    int id,arriveTime,toShef,toGriddle,getFood,counterNumber;
 
     public Customer(int id, int arriveTime) {
         this.id = id;
