@@ -47,5 +47,14 @@ public class MyQueue {
             return queue[tail];
         }
     }
+
+    public Customer firstElement() {
+        return queue[tail];
+    }
+
+    public boolean isEmpty() {
+        return size==0;
+
+    }
     
 }

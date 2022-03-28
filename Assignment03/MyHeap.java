@@ -1,7 +1,7 @@
 public class MyHeap {
 
     private Customer[] Heap;
-    private int size;
+    int size;
     private int maxsize;
     private static final int FRONT = 1;
  
@@ -103,5 +103,9 @@ public class MyHeap {
         minHeapify(FRONT);
  
         return popped;
+    }
+
+    public Customer minElement() {
+        return Heap[FRONT];
     }
 }
