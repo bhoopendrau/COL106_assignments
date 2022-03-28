@@ -87,7 +87,7 @@ public class HashMap {
 
     public static void main(String[] args) throws FileNotFoundException {
         String filePath = "C:\\Users\\Sumit\\Documents\\Coding\\COL106-assignments\\Assignment-4\\src\\vocabulary.txt";
-        HashTable table = new HashTable(filePath);
+        HashMap table = new HashMap(filePath);
         System.out.println(table.get("amy"));
         System.out.println(table.collisions);
     }
