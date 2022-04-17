@@ -9,9 +9,14 @@ all:
 	javac -d classes/ -cp classes/ Tester.java
 	javac -d classes/ -cp classes/ Tester2.java
 	javac -d classes/ -cp classes/ Tester3.java
+	javac -d classes/ -cp classes/ Tester1_5.java
+	javac -d classes/ -cp classes/ Tester1_4.java
 	java -cp classes/ Tester
 	java -cp classes/ Tester2
 	java -cp classes/ Tester3
+	java -cp classes/ Tester1_5
+	java -cp classes/ Tester1_4
+
 
 clean:
 	rm classes/IllegalIDException.class 

@@ -91,7 +91,11 @@ public void fireEmployee(int id, int manageid) throws IllegalIDException{
 public int boss(int id) throws IllegalIDException{
 	try {
 		Node employeeNode = searchTree.get(id);
-		return employeeNode.boss.getId();
+		if (employeeNode == root) {
+			return -1;
+		} else {
+			return employeeNode.boss.getId();
+		}
 	} catch (Exception e) {
 		throw new IllegalIDException("id not found");
 	}
@@ -110,15 +114,15 @@ public int lowestCommonBoss(int id1, int id2) throws IllegalIDException{
 				while (employee1.getLevel() > employee2.getLevel()) {
 					employee1 = employee1.boss;
 				}
-				if (employee1 == employee2) {
-					return employee1.getId();
+				if (employee1 == employee2 && employee1 != root) {
+					return employee1.boss.getId();
 				}
 			} else if (employee1.getLevel() < employee2.getLevel()) {
 				while (employee1.getLevel() < employee2.getLevel()) {
 					employee2 = employee2.boss;
 				}
-				if (employee1 == employee2) {
-					return employee1.getId();
+				if (employee1 == employee2 && employee1 != root) {
+					return employee1.boss.getId();
 				}
 			}
 			while (employee1.boss.getId() != employee2.boss.getId()) {

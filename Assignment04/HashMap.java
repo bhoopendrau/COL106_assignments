@@ -1,94 +1,244 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Scanner;
 
-
-public class HashMap {
-    private ArrayList<Bucket>[] table;
-    private int size;
-    public int collisions = 0;
-
-    private class Bucket {
-        private String key;
-        private ArrayList<String> values = new ArrayList<>();
-
-        public Bucket(String key, String val) {
-            this.key = key;
-            values.add(val);
-        }
-    }
-
-    private int hash(String s) {
-        int hash = 0;
-        for (int i=0; i<s.length(); i++) {
-            hash = ((int) s.charAt(i) + 256*hash) % this.size;
+public class HashMap
+{
+	int M = 24971;
+	GrowableArray[] hash_table;
+	public static long hash(String s)
+    {
+        long hash = 5381;
+        for (int i = 0;i<s.length();i++) 
+        {
+        	int character = (int)s.charAt(i);
+            hash = ((hash << 5) + hash) + character;
         }
         return hash;
     }
 
-    public HashMap(int size) {
-        float loadFactor = 0.75f;
-        this.size = (int) ((float)size/loadFactor);
-        table = new ArrayList[this.size];
-    }
+	@SuppressWarnings("unchecked")
+	public HashMap()
+	{
+		hash_table =new GrowableArray[this.M];
+	}
 
-    public HashMap(String filename) throws FileNotFoundException {
-        File file = new File(filename);
-        Scanner s = new Scanner(file);
+	@SuppressWarnings("static-access")
+	public void insert(String s)
+	{
+		int val =(int) Math.floorMod(this.hash(s),M);;
+		if (hash_table[val]==null)
+		{
+			hash_table[val] = new GrowableArray(2);
+		}
+		hash_table[val].add(s);
+	}
 
-        int vocabularySize = s.nextInt();
-        s.nextLine();
+	@SuppressWarnings("static-access")
+	public boolean contains(String s)
+	{
+		int val = (int) Math.floorMod(this.hash(s),M);
+		if (this.hash_table[val] == null)
+		{
+			return false;
+		}
+		for(int i = 0;i<this.hash_table[val].size();i++)
+		{
+			if (((String)this.hash_table[val].getAt(i)).compareTo(s)==0)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+}
 
-        float loadFactor = 0.75f;
-        this.size = (int) ((float)vocabularySize/loadFactor);
-        table = new ArrayList[this.size];
 
-        for (int i=0; i<vocabularySize; i++) {
-            String word = s.nextLine();
-            this.insert(word);
-        }
-    }
+class HashTable
+{
+	public GrowableArray[] hash_table;
+	public int Prime ;
+	public long R;
+	public GrowableArray checking;
 
-    public void insert(String s) {
-        String sorted = sort(s);
-        int hash = this.hash(sorted);
+	@SuppressWarnings("unchecked")
+	public HashTable(int Prime)
+	{
+		hash_table = new GrowableArray[Prime];
+		this.Prime = Prime;
+		this.R = 1779033703;
+		this.checking = new GrowableArray(2);
+	}
+	
+	public int hash(String s)
+	{
+		int count[] = new int[37];
+		for(int j = 0;j<s.length();j++)
+		{
+			count[this.atoi(s.charAt(j))]+=1;
+		}
+		long hash = 1L;
+		for(int i = 0;i<37;i++)
+		{
+			hash*=Math.floorMod(this.R+2*count[i]*(i+1), this.Prime);
+			hash = Math.floorMod(hash, this.Prime);
+		}
+		
+		return (int)hash;
+	}
 
-        if (this.table[hash] == null) { this.table[hash] = new ArrayList<>(); }
-        for (Bucket b: this.table[hash]) {
-            if (b.key.equals(sorted)) {
-                if  (!b.values.contains(s)) {
-                    b.values.add(s);
-                    return;
-                }
-                else { this.collisions++; }
-            }
-        }
-        this.table[hash].add(new Bucket(sorted, s));
-    }
+	public void print() {
+		for (int i=0; i<checking.size; i++) {
+			((GrowableArray)hash_table[(Integer)checking.getAt(i)].getAt(0)).print();
+		}
+	}
+	public int atoi(char temp)
+	{
+		if( Character.isDigit(temp) )
+		{
+			return (int)temp - (int)'0';
+		}
+		else if(Character.isLowerCase(temp))
+		{
+			return (int)temp - (int)'a'+10;
+		}
+		else
+		{
+			return 36;
+		}
+	}
+	public void insert(String s)
+	{
+		int index = hash(s)%this.Prime;
+		checking.add(index);
+		if (this.hash_table[index]==null)
+		{
+			this.hash_table[index] = new GrowableArray(2);
+		}
+		if(this.hash_table[index].size()==0)
+		{
+			GrowableArray ans = new GrowableArray(2);
+			ans.add(s);
+			this.hash_table[index].add(ans);
+			return ;
+		}
+		boolean present = false;
+		for(int i = 0;i<this.hash_table[index].size();i++ )
+		{
+			String we_get = (String)((GrowableArray)this.hash_table[index].getAt(i)).getAt(0);
+			if (we_get.length()!= s.length())
+				continue;
+			boolean got_it = true;
+			int [] count1 = new int[37];
+			int [] count2 = new int[37];
+			for(int j = 0;j<s.length();j++)
+			{
+				count1[this.atoi(s.charAt(j))]+=1;
+				count2[this.atoi(we_get.charAt(j))]+=1;
+			}
+			for(int j = 0;j<count1.length;j++)
+			{
+				if (count1[j]!=count2[j])
+				{
+					got_it = false;
+					break;
+				}
+			}
+			if (got_it)
+			{
+				present = true;
+				((GrowableArray)this.hash_table[index].getAt(i)).add(s);
+			}
+		}
+		if (!present)
+		{
+			GrowableArray ans = new GrowableArray(2);
+			ans.add(s);
+			this.hash_table[index].add(ans);
+		}
+	}
 
-    public ArrayList<String> get(String s) {
-        String sorted = sort(s);
-        int hash = this.hash(sorted);
-        if (this.table[hash] == null) {return new ArrayList<String>(); }
 
-        for (Bucket b: this.table[hash]) {
-            if (b.key.equals(sorted)) { return b.values; }
-        }
-        return new ArrayList<String>();
-    }
+	public int isPresent(String s)
+	{
+		int index = hash(s)%this.Prime;
+		if (this.hash_table[index]==null)
+		{
+			return 0;
+		}
+		if(this.hash_table[index].size()==0)
+		{
+			return 0;
+		}
+        //checking if anagram
+		for(int i = 0;i<this.hash_table[index].size();i++ )
+		{
+            String we_get = (String)((GrowableArray)this.hash_table[index].getAt(i)).getAt(0);
+			if (we_get.length()!= s.length())
+				continue;
+			
+			boolean got_it = true;
+			int [] count1 = new int[37];
+			int [] count2 = new int [37];
+			for(int j = 0;j<s.length();j++)
+			{
+				count1[this.atoi(s.charAt(j))]+=1;
+				count2[this.atoi(we_get.charAt(j))]+=1;
+			}
+			for(int j = 0;j<count1.length;j++)
+			{
+				if (count1[j]!=count2[j])
+				{
+					got_it = false;
+					break;
+				}
+			}
+			if (got_it)
+			{
+				return ((GrowableArray)this.hash_table[index].getAt(i)).size();
+			}
+		}
+		return 0;
 
-    private static String sort(String original) {
-        char[] chars = original.toCharArray();
-        Arrays.sort(chars);
-        return new String(chars);
-    }
+	}
 
-    public static void main(String[] args) throws FileNotFoundException {
-        String filePath = "C:\\Users\\Sumit\\Documents\\Coding\\COL106-assignments\\Assignment-4\\src\\vocabulary.txt";
-        HashMap table = new HashMap(filePath);
-        System.out.println(table.get("amy"));
-        System.out.println(table.collisions);
-    }
+	public GrowableArray anagrams(String s)
+	{
+		int index = hash(s)%this.Prime;
+		if (this.hash_table[index]==null)
+		{
+			return null;
+		}
+		if(this.hash_table[index].size()==0)
+		{
+			return null;
+		}
+
+        //checking if first element is anagram to s
+		for(int i = 0;i<this.hash_table[index].size();i++ )
+		{
+			String we_get = (String)((GrowableArray)this.hash_table[index].getAt(i)).getAt(0);
+			if (we_get.length()!= s.length())
+				continue;
+			boolean got_it = true;
+			int [] count1 = new int[37];
+			int [] count2 = new int [37];
+			for(int j = 0;j<s.length();j++)
+			{
+				count1[this.atoi(s.charAt(j))]+=1;
+				count2[this.atoi(we_get.charAt(j))]+=1;
+			}
+			for(int j = 0;j<count1.length;j++)
+			{
+				if (count1[j]!=count2[j])
+				{
+					got_it = false;
+					break;
+				}
+			}
+			if (got_it)
+			{
+				return (GrowableArray)this.hash_table[index].getAt(i);
+			}
+		}
+		return null;
+
+	}
 }
